@@ -6,6 +6,8 @@ sh build.sh lscstring
 sh build.sh lsio
 sh build.sh lstime
 sh build.sh lsorderedmap
+sh build.sh lsjson
+sh build.sh lspool
 sh build.sh lsepoll
 sh build.sh lsnet
 sh build.sh lshttp
