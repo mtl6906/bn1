@@ -1,0 +1,11 @@
+sh build.sh lsexception
+sh build.sh lsitem
+sh build.sh lscopyitem
+sh build.sh lsbuffer
+sh build.sh lscstring
+sh build.sh lsio
+sh build.sh lstime
+sh build.sh lsnet
+sh build.sh lshttp
+sh build.sh lslogger
+sh build.sh lsssl
