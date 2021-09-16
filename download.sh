@@ -1,11 +1,13 @@
-git clone https://github.com/mtl6906/lshttp.git
 git clone https://github.com/mtl6906/lsexception.git
 git clone https://github.com/mtl6906/lscstring.git
 git clone https://github.com/mtl6906/lsitem.git
 git clone https://github.com/mtl6906/lscopyableitem.git
-git clone https://github.com/mtl6906/lslogger.git
 git clone https://github.com/mtl6906/lstime.git
+git clone https://github.com/mtl6906/lslogger.git
+git clone https://github.com/mtl6906/lsepoll.git
 git clone https://github.com/mtl6906/lsssl.git
 git clone https://github.com/mtl6906/lsio.git
 git clone https://github.com/mtl6906/lsbuffer.git
 git clone https://github.com/mtl6906/lsnet.git
+git clone https://github.com/mtl6906/lsorderedmap.git
+git clone https://github.com/mtl6906/lshttp.git
