@@ -67,7 +67,7 @@ string buy(const string &coin, double price, int number)
 {
 	map<string, string> attribute;
 	attribute["X-MBX-APIKEY"] = apiKey;
-	string url = "/api/v2/order";
+	string url = "/api/v3/order";
 	http::QueryString qs;
 	qs.setParameter("symbol", coin);
 	qs.setParameter("side", "BUY");
