@@ -11,6 +11,7 @@
 #include "vector"
 #include "iostream"
 #include "memory"
+#include "unistd.h"
 
 using namespace ls;
 using namespace std;
@@ -141,8 +142,9 @@ void method()
 	double rate = 0.997;
 	for(;;)
 	{
+		sleep(1);
 		auto prices = getPrice();
-		auto buyOrderNumber = getBuyOrderNumber("GALAUSDT");
+		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
 		if(buyOrderNumber < orderNumber)
 		{
 			--orderNumber;
@@ -150,8 +152,8 @@ void method()
 		}
 		if(orderNumber == 0)
 		{
-			sell("GALAUSDT", prices[0], 200);
-			buy("GALAUSDT", prices[0] * 0.997, 200);
+			sell("AVAXUSDT", prices[0], 0.2);
+			buy("AVAXUSDT", prices[0] * 0.997, 0.2);
 			signPrice = prices[0];
 			orderNumber++;
 		}
@@ -163,8 +165,8 @@ void method()
 			long long signPriceNow = (long long)(signPrice * 1.005 * 10000);
 			if(currentPrice > signPriceNow)
 			{
-				sell("GALAUSDT", prices[0], 200);
-				buy("GALAUSDT", prices[0] * 0.997, 200);
+				sell("AVAXUSDT", prices[0], 0.2);
+				buy("AVAXUSDT", prices[0] * 0.997, 0.2);
 				signPriceBefore = signPrice;
 				signPrice = prices[0];
 				orderNumber++;
@@ -181,9 +183,9 @@ int main(int argc, char **argv)
 	url = argv[2];
 	apiKey = argv[3];
 	secretKey = argv[4];
-	getPrice();
-	cout << buy("GALAUSDT", 0.08, 200) << endl;
-	cout << sell("ARUSDT", 90, 0.3) << endl;
-
-	cout << getBuyOrderNumber("GALAUSDT") << endl;
+//	getPrice();
+//	cout << buy("GALAUSDT", 0.08, 200) << endl;
+//	cout << sell("ARUSDT", 90, 0.3) << endl;
+//	cout << getBuyOrderNumber("GALAUSDT") << endl;
+	method();
 }
