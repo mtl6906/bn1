@@ -137,8 +137,8 @@ int getBuyOrderNumber(const string &coin)
 void method()
 {
 	int orderNumber = 0;
-	int signPrice = 0;
-	int signPriceBefore = 0;
+	double signPrice = 0;
+	double signPriceBefore = 0;
 	double rate = 0.997;
 	for(;;)
 	{
