@@ -51,6 +51,7 @@ string transacation(const string &method, const string &url, const string &body 
 
 	LOGGER(ls::INFO) << "reading..." << ls::endl;
 
+	in.split("\r\n", true);
 	return in.split();
 }
 
@@ -59,20 +60,20 @@ vector<double> getPrice()
 	vector<double> prices(2);
 	string text = transacation("GET", "/api/v3/ticker/bookTicker?symbol=GALAUSDT");
 	cout << text << endl;
-//	auto root = json::api.decode(text);
-//	json::api.get(root, "bidPrice", prices[0]);
-//	json::api.get(root, "askPrice", prices[1]);
+	auto root = json::api.decode(text);
+	json::api.get(root, "bidPrice", prices[0]);
+	json::api.get(root, "askPrice", prices[1]);
 	return prices;
 }
 
-string buy(const string &coin, double price, int number)
+string order(const string &coin, double price, double number, const string &type)
 {
 	map<string, string> attribute;
 	attribute["Content-Type"] = "application/x-www-form-urlencoded";
 	attribute["X-MBX-APIKEY"] = apiKey;
 	http::QueryString qs;
 	qs.setParameter("symbol", coin);
-	qs.setParameter("side", "BUY");
+	qs.setParameter("side", type);
 	qs.setParameter("type", "LIMIT");
 	qs.setParameter("timeInForce", "GTC");
 	qs.setParameter("quantity", to_string(number));
@@ -87,12 +88,97 @@ string buy(const string &coin, double price, int number)
 	return transacation("POST", "/api/v3/order", body, attribute);
 }
 
+string buy(const string &coin, double price, int number)
+{
+	return order(coin, price, number, "BUY");
+}
+
+string sell(const string &coin, double price, int number)
+{
+	return order(coin, price, number, "SELL");
+}
+
+int getBuyOrderNumber(const string &coin)
+{
+	int count = 0;
+	http::QueryString qs;
+	qs.setParameter("symbol", coin);
+	qs.setParameter("recvWindow", "5000");
+	qs.setParameter("timestamp", to_string(time(NULL) * 1000));
+	string url = "/api/v3/openOrders?";
+	auto text = qs.toString();
+	url += text + "&signature=";
+	ls::SHA256 sha256;
+	url += sha256.hmac(text, secretKey);
+	auto responseText = transacation("GET", url);
+
+	LOGGER(ls::INFO) << responseText << ls::endl;
+
+	json::Array array;
+	array.parseFrom(responseText);
+	for(int i=0;i<array.size();++i)
+	{
+		json::Object it;
+		string type;
+		json::api.get(array, i, it);
+		json::api.get(it, "side", type);
+		if(type == "BUY");
+			++count;
+	}
+	return count;
+}
+
+void method()
+{
+	int orderNumber = 0;
+	int signPrice = 0;
+	int signPriceBefore = 0;
+	double rate = 0.997;
+	for(;;)
+	{
+		auto prices = getPrice();
+		auto buyOrderNumber = getBuyOrderNumber("GALAUSDT");
+		if(buyOrderNumber < orderNumber)
+		{
+			--orderNumber;
+			signPrice = signPriceBefore;
+		}
+		if(orderNumber == 0)
+		{
+			sell("GALAUSDT", prices[0], 200);
+			buy("GALAUSDT", prices[0] * 0.997, 200);
+			signPrice = prices[0];
+			orderNumber++;
+		}
+		else
+		{
+			if(orderNumber >= 5)
+				continue;
+			long long currentPrice = (long long)(prices[0] * 10000);
+			long long signPriceNow = (long long)(signPrice * 1.005 * 10000);
+			if(currentPrice > signPriceNow)
+			{
+				sell("GALAUSDT", prices[0], 200);
+				buy("GALAUSDT", prices[0] * 0.997, 200);
+				signPriceBefore = signPrice;
+				signPrice = prices[0];
+				orderNumber++;
+			}
+		}
+	}
+}
+
+
+
 int main(int argc, char **argv)
 {
-	ip = argv[1];
+	ip = argv[1];      
 	url = argv[2];
 	apiKey = argv[3];
 	secretKey = argv[4];
 	getPrice();
 	cout << buy("GALAUSDT", 0.08, 200) << endl;
+	cout << sell("ARUSDT", 90, 0.3) << endl;
+
+	cout << getBuyOrderNumber("GALAUSDT") << endl;
 }
