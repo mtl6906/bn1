@@ -74,7 +74,7 @@ string buy(const string &coin, double price, int number)
 	qs.setParameter("symbol", coin);
 	qs.setParameter("side", "BUY");
 	qs.setParameter("type", "LIMIT");
-	qs.setParameter("timeForce", "GTC");
+	qs.setParameter("timeInForce", "GTC");
 	qs.setParameter("quantity", to_string(number));
 	qs.setParameter("price", to_string(price));
 	qs.setParameter("timestamp", to_string(time(NULL)));
