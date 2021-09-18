@@ -91,18 +91,20 @@ string order(const string &coin, double price, double number, const string &type
 	return transacation("POST", "/api/v3/order", body, attribute);
 }
 
-string buy(const string &coin, double price, int number)
+string buy(const string &coin, double price, double number)
 {
 	return order(coin, price, number, "BUY");
 }
 
-string sell(const string &coin, double price, int number)
+string sell(const string &coin, double price, double number)
 {
 	return order(coin, price, number, "SELL");
 }
 
 int getBuyOrderNumber(const string &coin)
 {
+	map<string, string> attribute;
+	attribute["X-MBX-APIKEY"] = apiKey;
 	int count = 0;
 	http::QueryString qs;
 	qs.setParameter("symbol", coin);
