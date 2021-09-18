@@ -6,6 +6,7 @@
 #include "ls/net/Client.h"
 #include "ls/json/API.h"
 #include "ls/SHA256.h"
+#include "ls/DefaultLogger.h"
 #include "string"
 #include "vector"
 #include "iostream"
@@ -35,9 +36,14 @@ string transacation(const string &method, const string &url, const string &body 
 	io::OutputStream out(connection -> getWriter(), new Buffer());
 	out.append(request.toString());
 	out.write();
-	
+
+	LOGGER(ls::INFO) << "cmd sending..." << ls::endl;
+
 	io::InputStream in(connection -> getReader(), new Buffer());
 	in.read();
+
+	LOGGER(ls::INFO) << "reading..." << ls::endl;
+
 	return in.split();
 }
 
