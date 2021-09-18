@@ -150,7 +150,7 @@ void method()
 	double rate = 0.997;
 	for(;;)
 	{
-		sleep(3);
+		sleep(2);
 		auto prices = getPrice("AVAXUSDT");
 		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
 		if(buyOrderNumber < orderNumber)
