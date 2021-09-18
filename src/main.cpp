@@ -66,6 +66,7 @@ vector<double> getPrice()
 string buy(const string &coin, double price, int number)
 {
 	map<string, string> attribute;
+	attribute["Content-Type"] = "application/x-www-form-urlencoded";
 	attribute["X-MBX-APIKEY"] = apiKey;
 	string url = "/api/v3/order";
 	http::QueryString qs;
