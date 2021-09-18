@@ -136,6 +136,12 @@ int getBuyOrderNumber(const string &coin)
 	return count;
 }
 
+double round2(double value)
+{
+	int v = value * 100;
+	return v / 100.0;
+}
+
 void method()
 {
 	int orderNumber = 0;
@@ -155,7 +161,7 @@ void method()
 		if(orderNumber == 0)
 		{
 			sell("AVAXUSDT", prices[0], 0.2);
-			buy("AVAXUSDT", prices[0] * 0.997, 0.2);
+			buy("AVAXUSDT", round2(prices[0] * 0.997), 0.2);
 			signPrice = prices[0];
 			orderNumber++;
 		}
@@ -168,7 +174,7 @@ void method()
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
-				buy("AVAXUSDT", prices[0] * 0.997, 0.2);
+				buy("AVAXUSDT", round2(prices[0] * 0.997), 0.2);
 				signPriceBefore = signPrice;
 				signPrice = prices[0];
 				orderNumber++;
