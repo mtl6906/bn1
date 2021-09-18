@@ -92,14 +92,14 @@ string order(const string &coin, double price, double number, const string &type
 	return transacation("POST", "/api/v3/order", body, attribute);
 }
 
-string buy(const string &coin, double price, double number)
+void buy(const string &coin, double price, double number)
 {
-	return order(coin, price, number, "BUY");
+	LOGGER(ls::INFO) << order(coin, price, number, "BUY") << ls::endl;
 }
 
-string sell(const string &coin, double price, double number)
+void sell(const string &coin, double price, double number)
 {
-	return order(coin, price, number, "SELL");
+	LOGGER(ls::INFO) <<  order(coin, price, number, "SELL") << ls::endl;
 }
 
 int getBuyOrderNumber(const string &coin)
@@ -142,7 +142,7 @@ void method()
 	double rate = 0.997;
 	for(;;)
 	{
-		sleep(1);
+		sleep(3);
 		auto prices = getPrice("AVAXUSDT");
 		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
 		if(buyOrderNumber < orderNumber)
