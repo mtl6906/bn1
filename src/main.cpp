@@ -17,6 +17,7 @@ using namespace ls;
 using namespace std;
 
 char *ip, *url, *secretKey, *apiKey;
+double rate;
 
 string transacation(const string &method, const string &url, const string &body = "", const map<string, string> &attributes = map<string, string>())
 {
@@ -147,7 +148,6 @@ void method()
 	int orderNumber = 0;
 	double signPrice = 0;
 	double signPriceBefore = 0;
-	double rate = 0.997;
 	for(;;)
 	{
 		sleep(2);
@@ -161,7 +161,7 @@ void method()
 		if(orderNumber == 0)
 		{
 			sell("AVAXUSDT", prices[0], 0.2);
-			buy("AVAXUSDT", round2(prices[0] * 0.994), 0.2);
+			buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
 			signPrice = prices[0];
 			orderNumber++;
 		}
@@ -170,11 +170,11 @@ void method()
 			if(orderNumber >= 5)
 				continue;
 			long long currentPrice = (long long)(prices[0] * 10000);
-			long long signPriceNow = (long long)(signPrice * 1.006 * 10000);
+			long long signPriceNow = (long long)(signPrice * (1 + rate) * 10000);
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
-				buy("AVAXUSDT", round2(prices[0] * 0.994), 0.2);
+				buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
 				signPriceBefore = signPrice;
 				signPrice = prices[0];
 				orderNumber++;
@@ -191,6 +191,8 @@ int main(int argc, char **argv)
 	url = argv[2];
 	apiKey = argv[3];
 	secretKey = argv[4];
+	rate = stod(argv[5]);
+	LOGGER(ls::INFO) << "rate: " << rate << ls::endl;
 //	getPrice();
 //	cout << buy("GALAUSDT", 0.08, 200) << endl;
 //	cout << sell("ARUSDT", 90, 0.3) << endl;
