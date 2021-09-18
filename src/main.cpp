@@ -61,8 +61,11 @@ vector<double> getPrice()
 	string text = transacation("GET", "/api/v3/ticker/bookTicker?symbol=GALAUSDT");
 	cout << text << endl;
 	auto root = json::api.decode(text);
-	json::api.get(root, "bidPrice", prices[0]);
-	json::api.get(root, "askPrice", prices[1]);
+	string price;
+	json::api.get(root, "bidPrice", price);
+	prices[0] = stoi(price);
+	json::api.get(root, "askPrice", price);
+	prices[1] = stoi(price);
 	return prices;
 }
 
