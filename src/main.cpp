@@ -70,7 +70,6 @@ string buy(const string &coin, double price, int number)
 	map<string, string> attribute;
 	attribute["Content-Type"] = "application/x-www-form-urlencoded";
 	attribute["X-MBX-APIKEY"] = apiKey;
-	string url = "/api/v3/order";
 	http::QueryString qs;
 	qs.setParameter("symbol", coin);
 	qs.setParameter("side", "BUY");
@@ -84,7 +83,7 @@ string buy(const string &coin, double price, int number)
 	string signature = sha256.hmac(body, secretKey);
 	body.append("&sinature=");
 	body.append(signature);
-	return transacation("POST", "/api/v2/order", body, attribute);
+	return transacation("POST", "/api/v3/order", body, attribute);
 }
 
 int main(int argc, char **argv)
