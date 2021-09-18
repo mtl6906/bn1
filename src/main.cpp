@@ -115,7 +115,7 @@ int getBuyOrderNumber(const string &coin)
 	url += text + "&signature=";
 	ls::SHA256 sha256;
 	url += sha256.hmac(text, secretKey);
-	auto responseText = transacation("GET", url);
+	auto responseText = transacation("GET", url, "", attribute);
 
 	LOGGER(ls::INFO) << responseText << ls::endl;
 
