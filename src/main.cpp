@@ -94,12 +94,14 @@ string order(const string &coin, double price, double number, const string &type
 
 void buy(const string &coin, double price, double number)
 {
-	LOGGER(ls::INFO) << order(coin, price, number, "BUY") << ls::endl;
+	auto text = order(coin, price, number, "BUY");
+	LOGGER(ls::INFO) << text << ls::endl;
 }
 
 void sell(const string &coin, double price, double number)
 {
-	LOGGER(ls::INFO) <<  order(coin, price, number, "SELL") << ls::endl;
+	auto text = order(coin, price, number, "SELL");
+	LOGGER(ls::INFO) << text << ls::endl;
 }
 
 int getBuyOrderNumber(const string &coin)
