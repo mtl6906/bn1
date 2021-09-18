@@ -56,10 +56,10 @@ string transacation(const string &method, const string &url, const string &body 
 	return in.split();
 }
 
-vector<double> getPrice()
+vector<double> getPrice(const string &coin)
 {
 	vector<double> prices(2);
-	string text = transacation("GET", "/api/v3/ticker/bookTicker?symbol=GALAUSDT");
+	string text = transacation("GET", string("/api/v3/ticker/bookTicker?symbol=") + coin);
 	cout << text << endl;
 	auto root = json::api.decode(text);
 	string price;
@@ -143,7 +143,7 @@ void method()
 	for(;;)
 	{
 		sleep(1);
-		auto prices = getPrice();
+		auto prices = getPrice("AVAXUSDT");
 		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
 		if(buyOrderNumber < orderNumber)
 		{
