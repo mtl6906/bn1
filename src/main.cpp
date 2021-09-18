@@ -78,6 +78,7 @@ string buy(const string &coin, double price, int number)
 	qs.setParameter("quantity", to_string(number));
 	qs.setParameter("price", to_string(price));
 	qs.setParameter("timestamp", to_string(time(NULL)));
+	qs.setParameter("recvWindow", to_string(5000));
 	string body = qs.toString();
 	ls::SHA256 sha256;
 	string signature = sha256.hmac(body, secretKey);
