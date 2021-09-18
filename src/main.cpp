@@ -34,7 +34,11 @@ string transacation(const string &method, const string &url, const string &body 
 	connection -> connect();
 	
 	io::OutputStream out(connection -> getWriter(), new Buffer());
-	out.append(request.toString());
+	string text = request.toString();
+	
+	LOGGER(ls::INFO) << "request:\n" << text << ls::endl;
+	
+	out.append(text);
 	out.write();
 
 	LOGGER(ls::INFO) << "cmd sending..." << ls::endl;
