@@ -81,7 +81,7 @@ string buy(const string &coin, double price, int number)
 	string body = qs.toString();
 	ls::SHA256 sha256;
 	string signature = sha256.hmac(body, secretKey);
-	body.append("&sinature=");
+	body.append("&signature=");
 	body.append(signature);
 	return transacation("POST", "/api/v3/order", body, attribute);
 }
