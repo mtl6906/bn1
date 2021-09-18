@@ -64,9 +64,9 @@ vector<double> getPrice()
 	auto root = json::api.decode(text);
 	string price;
 	json::api.get(root, "bidPrice", price);
-	prices[0] = stoi(price);
+	prices[0] = stod(price);
 	json::api.get(root, "askPrice", price);
-	prices[1] = stoi(price);
+	prices[1] = stod(price);
 	return prices;
 }
 
