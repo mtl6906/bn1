@@ -161,7 +161,7 @@ void method()
 		if(orderNumber == 0)
 		{
 			sell("AVAXUSDT", prices[0], 0.2);
-			buy("AVAXUSDT", round2(prices[0] * 0.997), 0.2);
+			buy("AVAXUSDT", round2(prices[0] * 0.994), 0.2);
 			signPrice = prices[0];
 			orderNumber++;
 		}
@@ -170,11 +170,11 @@ void method()
 			if(orderNumber >= 5)
 				continue;
 			long long currentPrice = (long long)(prices[0] * 10000);
-			long long signPriceNow = (long long)(signPrice * 1.005 * 10000);
+			long long signPriceNow = (long long)(signPrice * 1.006 * 10000);
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
-				buy("AVAXUSDT", round2(prices[0] * 0.997), 0.2);
+				buy("AVAXUSDT", round2(prices[0] * 0.994), 0.2);
 				signPriceBefore = signPrice;
 				signPrice = prices[0];
 				orderNumber++;
