@@ -27,6 +27,8 @@ string transacation(const string &method, const string &url, const string &body 
 	request.getVersion() = "HTTP/1.1";
 	request.setAttribute("Host", "api.binance.com");
 	request.setAttribute("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0");
+	if(body != "")
+		request.setAttribute("Content-Length", to_string(body.size()));
 	for(auto &attribute : attributes)
 		request.setAttribute(attribute.first, attribute.second);
 	ssl::Client sslClient;
