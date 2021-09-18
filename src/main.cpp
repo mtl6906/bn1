@@ -17,7 +17,7 @@ using namespace ls;
 using namespace std;
 
 char *ip, *url, *secretKey, *apiKey;
-double rate;
+double rate, uprate;
 
 string transacation(const string &method, const string &url, const string &body = "", const map<string, string> &attributes = map<string, string>())
 {
@@ -170,7 +170,7 @@ void method()
 			if(orderNumber >= 5)
 				continue;
 			long long currentPrice = (long long)(prices[0] * 10000);
-			long long signPriceNow = (long long)(signPrice * (1 + rate) * 10000);
+			long long signPriceNow = (long long)(signPrice * (1 + uprate) * 10000);
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
@@ -192,6 +192,7 @@ int main(int argc, char **argv)
 	apiKey = argv[3];
 	secretKey = argv[4];
 	rate = stod(argv[5]);
+	uprate = stod(argv[6]);
 	LOGGER(ls::INFO) << "rate: " << rate << ls::endl;
 //	getPrice();
 //	cout << buy("GALAUSDT", 0.08, 200) << endl;
