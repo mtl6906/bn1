@@ -51,7 +51,7 @@ string transacation(const string &method, const string &url, const string &body 
 
 	LOGGER(ls::INFO) << "reading..." << ls::endl;
 
-	in.split("\r\n", true);
+	in.split("\r\n\r\n", true);
 	return in.split();
 }
 
