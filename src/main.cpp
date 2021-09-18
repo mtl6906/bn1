@@ -49,12 +49,12 @@ string transacation(const string &method, const string &url, const string &body 
 
 vector<double> getPrice()
 {
-	vector<double> prices(1);
+	vector<double> prices(2);
 	string text = transacation("GET", "/api/v3/ticker/bookTicker?symbol=GALAUSDT");
 	cout << text << endl;
-	auto root = json::api.decode(text);
-	json::api.get(root, "bidPrice", prices[0]);
-	json::api.get(root, "askPrice", prices[1]);
+//	auto root = json::api.decode(text);
+//	json::api.get(root, "bidPrice", prices[0]);
+//	json::api.get(root, "askPrice", prices[1]);
 	return prices;
 }
 
