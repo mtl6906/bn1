@@ -1,7 +1,7 @@
 sh build.sh lssha256
 sh build.sh lsexception
 sh build.sh lsitem
-sh build.sh lscopyitem
+sh build.sh lscopyableitem
 sh build.sh lsbuffer
 sh build.sh lscstring
 sh build.sh lsio
