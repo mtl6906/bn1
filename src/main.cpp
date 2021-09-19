@@ -106,7 +106,7 @@ void sell(const string &coin, double price, double number)
 	LOGGER(ls::INFO) << text << ls::endl;
 }
 
-int getBuyOrderNumber(const string &coin)
+pair<int, double> getBuyOrderNumberAndMax(const string &coin)
 {
 	map<string, string> attribute;
 	attribute["X-MBX-APIKEY"] = apiKey;
@@ -124,6 +124,7 @@ int getBuyOrderNumber(const string &coin)
 
 	LOGGER(ls::INFO) << responseText << ls::endl;
 
+	double maxPrice = 0;
 	json::Array array;
 	array.parseFrom(responseText);
 	for(int i=0;i<array.size();++i)
@@ -132,10 +133,20 @@ int getBuyOrderNumber(const string &coin)
 		string type;
 		json::api.get(array, i, it);
 		json::api.get(it, "side", type);
-		if(type == "BUY");
+		if(type == "BUY")
+		{
 			++count;
+			double price;
+			json::api.get(it, "price", price);
+			int p1 = (int)(maxPrice * 100), p2 = (int)(price * 100);
+			if(p1 < p2)
+				maxPrice = p2;
+		}
 	}
-	return count;
+	pair<int, double> result;
+	result.first = count;
+	result.second = maxPrice;
+	return result;
 }
 
 double round2(double value)
@@ -146,31 +157,26 @@ double round2(double value)
 
 void method()
 {
-	stack<double> signPrices;
 	for(;;)
 	{
 		sleep(2);
 		auto prices = getPrice("AVAXUSDT");
-		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
-		while(buyOrderNumber < signPrices.size())
-			signPrices.pop();
-		if(signPrices.size() == 0)
+		auto buyOrderNumber = getBuyOrderNumberAndMax("AVAXUSDT");
+		if(buyOrderNumber.first == 0)
 		{
 			sell("AVAXUSDT", prices[0], 0.2);
 			buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
-			signPrices.push(prices[0]);
 		}
 		else
 		{
-			if(signPrices.size() >= 5)
+			if(buyOrderNumber.first >= 5)
 				continue;
 			long long currentPrice = (long long)(prices[0] * 10000);
-			long long signPriceNow = (long long)(signPrices.top() * (1 + uprate) * 10000);
+			long long signPriceNow = (long long)(buyOrderNumber.second * (1 + uprate) * 10000);
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
 				buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
-				signPrices.push(prices[0]);
 			}
 		}
 	}
