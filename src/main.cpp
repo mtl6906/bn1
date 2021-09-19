@@ -136,11 +136,12 @@ pair<int, double> getBuyOrderNumberAndMax(const string &coin)
 		if(type == "BUY")
 		{
 			++count;
-			double price;
-			json::api.get(it, "price", price);
+			string text;
+			json::api.get(it, "price", text);
+			double price = stod(text);
 			int p1 = (int)(maxPrice * 100), p2 = (int)(price * 100);
 			if(p1 < p2)
-				maxPrice = p2;
+				maxPrice = price;
 		}
 	}
 	pair<int, double> result;
