@@ -11,6 +11,7 @@
 #include "vector"
 #include "iostream"
 #include "memory"
+#include "stack"
 #include "unistd.h"
 
 using namespace ls;
@@ -145,39 +146,31 @@ double round2(double value)
 
 void method()
 {
-	int orderNumber = 0;
-	double signPrice = 0;
-	double signPriceBefore = 0;
+	stack<double> signPrices;
 	for(;;)
 	{
 		sleep(2);
 		auto prices = getPrice("AVAXUSDT");
 		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
-		if(buyOrderNumber < orderNumber)
-		{
-			orderNumber = buyOrderNumber;
-			signPrice = signPriceBefore;
-		}
-		if(orderNumber == 0)
+		while(buyOrderNumber < signPrices.size())
+			signPrices.pop();
+		if(signPrices.size() == 0)
 		{
 			sell("AVAXUSDT", prices[0], 0.2);
 			buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
-			signPrice = prices[0];
-			orderNumber++;
+			signPrices.push(prices[0]);
 		}
 		else
 		{
-			if(orderNumber >= 5)
+			if(signPrices.size() >= 5)
 				continue;
 			long long currentPrice = (long long)(prices[0] * 10000);
-			long long signPriceNow = (long long)(signPrice * (1 + uprate) * 10000);
+			long long signPriceNow = (long long)(signPrices.top() * (1 + uprate) * 10000);
 			if(currentPrice > signPriceNow)
 			{
 				sell("AVAXUSDT", prices[0], 0.2);
 				buy("AVAXUSDT", round2(prices[0] * (1 - rate)), 0.2);
-				signPriceBefore = signPrice;
-				signPrice = prices[0];
-				orderNumber++;
+				signPrices.push(prices[0]);
 			}
 		}
 	}
