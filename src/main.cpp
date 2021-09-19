@@ -155,7 +155,7 @@ void method()
 		auto buyOrderNumber = getBuyOrderNumber("AVAXUSDT");
 		if(buyOrderNumber < orderNumber)
 		{
-			--orderNumber;
+			orderNumber = buyOrderNumber;
 			signPrice = signPriceBefore;
 		}
 		if(orderNumber == 0)
