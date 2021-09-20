@@ -1,4 +1,5 @@
 #include "ls/http/Request.h"
+#include "ls/http/Response.h"
 #include "ls/http/QueryString.h"
 #include "ls/io/InputStream.h"
 #include "ls/io/OutputStream.h"
@@ -17,7 +18,7 @@
 using namespace ls;
 using namespace std;
 
-char *ip, *url, *secretKey, *apiKey, coinname;
+char *ip, *url, *secretKey, *apiKey, *coinname;
 double rate, uprate, coinnumber;
 
 io::InputStream in(nullptr, new Buffer());
@@ -54,7 +55,7 @@ string transacation(const string &method, const string &url, const string &body 
 
 	in.reset(connection -> getReader());
 
-	Response response;
+	http::Response response;
 	string result;
 	for(;;)
 	{
@@ -67,12 +68,12 @@ string transacation(const string &method, const string &url, const string &body 
 				auto text = in.split("\r\n\r\n", true);
 				response.parseFrom(text);
 			}
-			int contentLength = response.getAttribute("Content-Length");
+			int contentLength = stoi(response.getAttribute("Content-Length"));
 			result = in.split(contentLength);
 		}
 		catch(Exception &e)
 		{
-			sleep(1)
+			sleep(1);
 			continue;
 		}
 		break;
