@@ -138,31 +138,22 @@ void sell(const string &coin, double price, double number)
 	LOGGER(ls::INFO) << text << ls::endl;
 }
 
-vector<vector<pair<double, double>>> getAllOrders(const string &coin)
+json::Array getOrders(const string &coin)
 {
-	vector<vector<pair<double, double>>> orders;
 	map<string, string> attribute;
 	attribute["X-MBX-APIKEY"] = apiKey;
 	string url = "/api/v3/allOrders?";
 	http::QueryString qs;
 	string ts = to_string(time(NULL) * 1000);
 	qs.setParameter("symbol", "coin");
-	qs.setParameter("startTime", to_string(time(NULL) - 48 * 3600 * 1000));
-	qs.setParameter("endTime", ts);
 	qs.setParameter("timestamp", ts);
 	qs.setParameter("signature", signature({qs.toString()}));
 	url += qs.toString();
 
 	auto responseText = transacation("GET", url, "", attribute);
-	
-	cout << responseText << endl;
-
+	json::Array orders;
+	orders.parseFrom(responseText);
 	return orders;
-}
-
-vector<vector<pair<double, double>>> getOrdersOnSort()
-{
-		
 }
 
 pair<int, double> getBuyOrderNumberAndMax(const string &coin)
@@ -260,5 +251,6 @@ int main(int argc, char **argv)
 //	cout << sell("ARUSDT", 90, 0.3) << endl;
 //	cout << getBuyOrderNumber("GALAUSDT") << endl;
 //	method(coinname, coinnumber);
-	getAllOrders("AVAXUSDT");
+	auto orders = getOrders("AVAXUSDT");
+	cout << orders.size() << endl;
 }
