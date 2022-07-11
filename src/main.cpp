@@ -1,4 +1,5 @@
 #include "ls/http/Request.h"
+#include "ls/http/StringBody.h"
 #include "ls/http/Response.h"
 #include "ls/http/QueryString.h"
 #include "ls/io/InputStream.h"
@@ -14,6 +15,7 @@
 #include "memory"
 #include "stack"
 #include "unistd.h"
+#include "thread"
 
 using namespace ls;
 using namespace std;
@@ -39,7 +41,7 @@ string transacation(const string &method, const string &url, const string &body 
 	request.setDefaultHeader();
 	request.getMethod() = method;
 	request.getURL() = url;
-	request.getBody() = body;
+	request.setBody(new http::StringBody(body, "application/x-www-form-urlencoded"));
 	request.getVersion() = "HTTP/1.1";
 	request.setAttribute("Host", "api.binance.com");
 	request.setAttribute("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0");
@@ -58,6 +60,7 @@ string transacation(const string &method, const string &url, const string &body 
 	LOGGER(ls::INFO) << "request:\n" << text << ls::endl;
 	
 	out.append(text);
+	out.append(body);
 	out.write();
 
 	LOGGER(ls::INFO) << "cmd sending..." << ls::endl;
@@ -76,9 +79,11 @@ string transacation(const string &method, const string &url, const string &body 
 			{
 				auto text = in.split("\r\n\r\n", true);
 				response.parseFrom(text);
+				LOGGER(ls::INFO) << text << ls::endl;
 			}
 			int contentLength = stoi(response.getAttribute("Content-Length"));
 			result = in.split(contentLength);
+			LOGGER(ls::INFO) << text << ls::endl;
 		}
 		catch(Exception &e)
 		{
@@ -88,6 +93,22 @@ string transacation(const string &method, const string &url, const string &body 
 		break;
 	}
 	return result;
+}
+
+void cancelAllOrders(const string &coin)
+{
+	http::QueryString qs;
+	qs.setParameter("symbol", coin);
+	qs.setParameter("timestamp", to_string(time(NULL) * 1000));
+	qs.setParameter("recvWindow", to_string(5000));
+	map<string, string> attribute;
+	attribute["X-MBX-APIKEY"] = apiKey;
+	ls::SHA256 sha256;
+	string body = qs.toString();
+	string signature = sha256.hmac(body, secretKey);
+	body += "&signature=" + signature;
+	auto responseText = transacation("DELETE", "/api/v3/openOrders?" + body, "", attribute);
+	cout << responseText << endl;
 }
 
 vector<double> getPrice(const string &coin)
@@ -107,7 +128,6 @@ vector<double> getPrice(const string &coin)
 string order(const string &coin, double price, double number, const string &type)
 {
 	map<string, string> attribute;
-	attribute["Content-Type"] = "application/x-www-form-urlencoded";
 	attribute["X-MBX-APIKEY"] = apiKey;
 	http::QueryString qs;
 	qs.setParameter("symbol", coin);
@@ -126,26 +146,35 @@ string order(const string &coin, double price, double number, const string &type
 	return transacation("POST", "/api/v3/order", body, attribute);
 }
 
-void buy(const string &coin, double price, double number)
+string buy(const string &coin, double price, double number)
 {
 	auto text = order(coin, price, number, "BUY");
 	LOGGER(ls::INFO) << text << ls::endl;
+	return text;
 }
 
-void sell(const string &coin, double price, double number)
+string sell(const string &coin, double price, double number)
 {
 	auto text = order(coin, price, number, "SELL");
 	LOGGER(ls::INFO) << text << ls::endl;
+	return text;
+}
+
+double round2(double value)
+{
+	int v = value * 100;
+	return v / 100.0;
 }
 
 json::Array getOrders(const string &coin)
 {
 	map<string, string> attribute;
 	attribute["X-MBX-APIKEY"] = apiKey;
-	string url = "/api/v3/allOrders?";
+	string url = "/api/v3/openOrders?";
 	http::QueryString qs;
 	string ts = to_string(time(NULL) * 1000);
-	qs.setParameter("symbol", "coin");
+	qs.setParameter("symbol", coin);
+	qs.setParameter("recvWindow", "5000");
 	qs.setParameter("timestamp", ts);
 	qs.setParameter("signature", signature({qs.toString()}));
 	url += qs.toString();
@@ -200,11 +229,6 @@ pair<int, double> getBuyOrderNumberAndMax(const string &coin)
 	return result;
 }
 
-double round2(double value)
-{
-	int v = value * 100;
-	return v / 100.0;
-}
 
 void method(const string &coin, double number)
 {
@@ -215,8 +239,8 @@ void method(const string &coin, double number)
 		auto buyOrderNumber = getBuyOrderNumberAndMax(coin);
 		if(buyOrderNumber.first == 0)
 		{
+			buy(coin, round2(prices[1]), number);
 			sell(coin, prices[0], number);
-			buy(coin, round2(prices[0] * (1 - rate)), number);
 		}
 		else
 		{
@@ -234,6 +258,7 @@ void method(const string &coin, double number)
 }
 
 
+/*
 
 int main(int argc, char **argv)
 {
@@ -254,3 +279,114 @@ int main(int argc, char **argv)
 	auto orders = getOrders("AVAXUSDT");
 	cout << orders.size() << endl;
 }
+
+*/
+
+void method1()
+{
+	for(;;)
+	{
+		int ch;
+		cout << "1. order" << endl;
+		cout << "2. cancel" << endl;
+		cin >> ch;
+		if(ch == 1)
+		{
+			auto result = getPrice("BTCBUSD");	
+			buy("BTCBUSD", result[0], 0.00111);
+			sell("BTCBUSD", result[0] + 1, 0.00111);
+		}
+		else if(ch == 2)
+		{
+			cancelAllOrders("BTCBUSD");
+		}
+	}
+}
+
+double buyprice = 0;
+
+void method2()
+{
+	for(;;)
+	{
+		auto result = getPrice("BTCBUSD");	
+		auto text = buy("BTCBUSD", result[0], 0.00113);
+		auto root = json::api.decode(text);
+		string status;
+		try
+		{
+			json::api.get(root, "status", status);
+			buyprice = result[0];
+		}
+		catch(Exception &e)
+		{
+		
+		}
+
+		while(buyprice > 1)
+		{
+			auto array = getOrders("BTCBUSD");
+			if(array.size() == 0)
+			{	
+				sell("BTCBUSD", buyprice + 3, 0.00113);
+				buyprice = 0;
+				break;
+			}
+		}
+		sleep(5);
+	}
+}
+
+void method4()
+{
+	for(;;)
+	{
+		auto result = getPrice("BTCBUSD");
+		buy("BTCBUSD", result[0], 0.00113);
+		sell("BTCBUSD", result[0] + 5, 0.00113);
+		json::Array array;
+		do
+		{
+			sleep(2);
+			array = getOrders("BTCBUSD");
+		}
+		while(array.size() > 0);
+	}
+}
+
+void cancelT()
+{
+	for(;;)
+	{
+		int c;
+		cin >> c;
+	       	if(c == 1)	
+		{
+			buyprice = 0;
+			cancelAllOrders("BTCBUSD");
+		}
+	}
+}
+
+int main(int argc, char **argv)
+{
+	ip = argv[1];
+	url = argv[2];
+	apiKey = argv[3];
+	secretKey = argv[4];
+for(;;)
+{
+	try 
+	{
+		method4();
+	}
+	catch(Exception &e)
+	{
+		continue;
+	}
+}
+//	cout << result[0] << " " << result[1] << endl;
+
+	return 0;
+}
+
